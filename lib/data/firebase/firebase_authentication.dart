@@ -9,7 +9,7 @@ class FirebaseAuthentication implements Authentication {
       : _firebaseAuth = firebaseAuth ?? firebase_auth.FirebaseAuth.instance;
 
   @override
-  String? getLoggedinUserId() => _firebaseAuth.currentUser?.uid;
+  String? getLoggedInUserId() => _firebaseAuth.currentUser?.uid;
 
   @override
   Future<Result<String>> login(
@@ -45,4 +45,5 @@ class FirebaseAuthentication implements Authentication {
           '${e.message}'); // buat jadi string karena message nya nullable alias String?
     }
   }
+
 }

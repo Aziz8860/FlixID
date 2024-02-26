@@ -1,42 +1,109 @@
-import 'package:flix_id/data/firebase/firebase_authentication.dart';
-import 'package:flix_id/data/firebase/firebase_user_repository.dart';
+import 'package:flix_id/presentation/extensions/build_context_extension.dart';
+import 'package:flix_id/presentation/misc/methods.dart';
+import 'package:flix_id/presentation/widgets/flix_text_field.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../data/dummies/dummy_authentication.dart';
-import '../../../data/dummies/dummy_user_repository.dart';
-import '../../../domain/use_cases/login/login.dart';
-import '../../providers/use_cases/login_provider.dart';
-import '../main_page/main_page.dart';
+import '../../providers/router/router_provider.dart';
+import '../../providers/user_data/user_data_provider.dart';
 
 class LoginPage extends ConsumerWidget {
-  const LoginPage({Key? key}) : super(key: key);
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
+
+  LoginPage({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Login'),
-      ),
-      body: Center(
-        child: ElevatedButton(
-            onPressed: () {
-              Login login = ref.watch(loginProvider);
+    ref.listen(
+      userDataProvider,
+      (previous, next) {
+        if (next is AsyncData) {
+          if (next.value != null) {
+            ref.read(routerProvider).goNamed('main');
+          }
+        } else if (next is AsyncError) {
+          context.showSnackBar(next.error.toString());
+        }
+      },
+    );
 
-              login(LoginParams(email: 'erik2@gmail.com', password: 'data123'))
-                  .then((result) {
-                if (result.isSuccess) {
-                  Navigator.of(context).push(MaterialPageRoute(
-                    builder: (context) => MainPage(user: result.resultValue!),
-                  ));
-                } else {
-                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                    content: Text(result.errorMessage!),
-                  ));
-                }
-              });
-            },
-            child: const Text('Login')),
+    return Scaffold(
+      body: ListView(
+        children: [
+          verticalSpace(100),
+          Center(
+            child: Image.asset(
+              'assets/flix_logo.png',
+              width: 150,
+            ),
+          ),
+          verticalSpace(100),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24),
+            child: Column(
+              children: [
+                FlixTextField(
+                  labelText: 'Email',
+                  controller: emailController,
+                ),
+                verticalSpace(24),
+                FlixTextField(
+                  labelText: 'Password',
+                  controller: passwordController,
+                  obscureText: true,
+                ),
+                Align(
+                    alignment: Alignment.centerRight,
+                    child: TextButton(
+                      onPressed: () {},
+                      child: const Text(
+                        'Forgot password?',
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                    )),
+                verticalSpace(24),
+                switch (ref.watch(userDataProvider)) {
+                  AsyncData(:final value) => value == null
+                      ? SizedBox(
+                          width: double.infinity,
+                          child: ElevatedButton(
+                              onPressed: () {
+                                ref.read(userDataProvider.notifier).login(
+                                    email: emailController.text,
+                                    password: passwordController.text);
+                              },
+                              child: const Text(
+                                'Login',
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              )),
+                        )
+                      : const Center(
+                          child: CircularProgressIndicator(),
+                        ),
+                  _ => const Center(
+                      child: CircularProgressIndicator(),
+                    ),
+                },
+                verticalSpace(24),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Text("Don't have an account? "),
+                    TextButton(
+                        onPressed: () {
+                          ref.read(routerProvider).goNamed('register');
+                        },
+                        child: const Text(
+                          'Register here',
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ))
+                  ],
+                )
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }

@@ -3,7 +3,7 @@ import 'package:flix_id/domain/entities/result.dart';
 
 class DummyAuthentication implements Authentication {
   @override
-  String? getLoggedinUserId() {
+  String? getLoggedInUserId() {
     // TODO: implement getLoggedinUserId
     throw UnimplementedError();
   }
