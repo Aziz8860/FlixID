@@ -8,7 +8,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../domain/entities/movie.dart';
+import '../../../domain/entities/movie_detail.dart';
 import 'methods/background.dart';
+import 'methods/cast_and_crew.dart';
+import 'methods/movie_overview.dart';
+import 'methods/movie_short_info.dart';
 
 class DetailPage extends ConsumerWidget {
   final Movie movie;
@@ -45,19 +49,28 @@ class DetailPage extends ConsumerWidget {
                       fit: BoxFit.cover,
                     ),
                     verticalSpace(24),
-                    // ...movieShortInfo(),
+                    ...movieShortInfo(
+                        asyncMovieDetail: asyncMovieDetail, context: context),
                     verticalSpace(20),
-                    // ...movieOverview(),
+                    ...movieOverview(asyncMovieDetail),
                     verticalSpace(40),
                   ],
                 ),
               ),
-              // ...castAndCrew(),
+              ...castAndCrew(movie: movie, ref: ref),
               Padding(
                 padding:
                     const EdgeInsets.symmetric(vertical: 40, horizontal: 24),
                 child: ElevatedButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      MovieDetail? movieDetail = asyncMovieDetail.valueOrNull;
+
+                      if (movieDetail != null) {
+                        ref
+                            .read(routerProvider)
+                            .pushNamed('time-booking', extra: movieDetail);
+                      }
+                    },
                     style: ElevatedButton.styleFrom(
                         foregroundColor: backgroundColor,
                         backgroundColor: saffron,

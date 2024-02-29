@@ -21,7 +21,7 @@ class BackNavigationBar extends StatelessWidget {
         ),
         horizontalSpace(20),
         SizedBox(
-          width: MediaQuery.of(context).size.width - 60 - 48,
+          width: MediaQuery.of(context).size.width - 60 - 48, // 24 x 2 kanan kiri, 40 sized box, 20 horizontal space
           child: Text(
             title,
             maxLines: 1,

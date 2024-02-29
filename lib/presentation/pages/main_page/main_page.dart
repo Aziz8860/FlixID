@@ -1,4 +1,8 @@
+import 'dart:io';
+
+import 'package:flix_id/domain/entities/user.dart';
 import 'package:flix_id/presentation/pages/movie_page/movie_page.dart';
+import 'package:flix_id/presentation/pages/ticket_page/ticket_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -10,7 +14,9 @@ import '../../widgets/bottom_nav_bar_item.dart';
 import '../profile_page/profile_page.dart';
 
 class MainPage extends ConsumerStatefulWidget {
-  const MainPage({Key? key}) : super(key: key);
+  final File? imageFile;
+
+  const MainPage({this.imageFile, Key? key}) : super(key: key);
 
   @override
   ConsumerState<MainPage> createState() => _MainPageState();
@@ -19,6 +25,19 @@ class MainPage extends ConsumerStatefulWidget {
 class _MainPageState extends ConsumerState<MainPage> {
   PageController pageController = PageController();
   int selectedPage = 0;
+
+  @override
+  void initState() {
+    super.initState();
+
+    User? user = ref.read(userDataProvider).valueOrNull;
+
+    if (widget.imageFile != null && user != null) {
+      ref
+          .read(userDataProvider.notifier)
+          .uploadProfilePicture(user: user, imageFile: widget.imageFile!);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -46,7 +65,7 @@ class _MainPageState extends ConsumerState<MainPage> {
                 child: MoviePage(),
               ),
               Center(
-                child: Text('Ticket Page'),
+                child: TicketPage(),
               ),
               Center(
                 child: ProfilePage(),
